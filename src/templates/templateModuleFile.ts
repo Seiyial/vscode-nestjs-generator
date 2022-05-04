@@ -4,7 +4,7 @@ export const writeTemplateModuleFile = (
 	resourceNameKebab: string,
 	hasController: boolean,
 	extraImportsFromNestCommon: string[] = [],
-	customImports: string = "import { PrismaModule } from 'setup/db'",
+	customImports: string = "import { PrismaModule } from 'setup/db/prisma.module'",
 ) => {
 
 	const svc = resourceNamePascal + 'Service';
