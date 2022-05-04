@@ -2,7 +2,7 @@
 	"name": "vscode-nestjs-generator",
 	"displayName": "NestJS resource generator",
 	"description": "Generate NestJS modules, services and controllers by right-clicking VSCode folders.",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.66.0"
 	},
@@ -12,9 +12,9 @@
 	"activationEvents": [
 		"onCommand:vscode-nestjs-generator.createInManualSpecifiedFolder",
 		"onCommand:vscode-nestjs-generator.createAtTargetedFolder",
-		"onCommand:vscode-nestjs-generator.createAtTargetedFolderNoCon",
+		"onCommand:vscode-nestjs-generator.createAtTargetedFolderNoController",
 		"onCommand:vscode-nestjs-generator.createInSubFolder",
-		"onCommand:vscode-nestjs-generator.createInSubFolderNoCon"
+		"onCommand:vscode-nestjs-generator.createInSubFolderNoController"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
