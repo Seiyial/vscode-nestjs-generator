@@ -32,7 +32,7 @@
 			},
 			{
 				"category": "NestJS Generator",
-				"command": "vscode-nestjs-generator.createAtTargetedFolderNoCon",
+				"command": "vscode-nestjs-generator.createAtTargetedFolderNoController",
 				"title": "Create NestJS Mod/Svc here...",
 				"enablement": "explorerResourceIsFolder && explorerViewletFocus"
 			},
@@ -44,7 +44,7 @@
 			},
 			{
 				"category": "NestJS Generator",
-				"command": "vscode-nestjs-generator.createInSubFolderNoCon",
+				"command": "vscode-nestjs-generator.createInSubFolderNoController",
 				"title": "Create subfolder with NestJS Mod/Svc...",
 				"enablement": "explorerResourceIsFolder && explorerViewletFocus"
 			}
@@ -57,7 +57,7 @@
 				},
 				{
 					"group": "2_workspace",
-					"command": "vscode-nestjs-generator.createAtTargetedFolderNoCon"
+					"command": "vscode-nestjs-generator.createAtTargetedFolderNoController"
 				},
 				{
 					"group": "2_workspace",
@@ -65,7 +65,7 @@
 				},
 				{
 					"group": "2_workspace",
-					"command": "vscode-nestjs-generator.createInSubFolderNoCon"
+					"command": "vscode-nestjs-generator.createInSubFolderNoController"
 				}
 			]
 		}
