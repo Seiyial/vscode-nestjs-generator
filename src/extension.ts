@@ -22,6 +22,24 @@ const createInFolder = async (targetFolder: vscode.Uri, resourceNameKebabCase: s
 	);
 };
 
+const getActualURI = async (inputURI: vscode.Uri): Promise<vscode.Uri | null> => {
+	const uri = ((await vscode.workspace.fs.stat(inputURI)).type === vscode.FileType.Directory) ? inputURI : uriUtils.resolvePath(inputURI, '..');
+	if ((await vscode.workspace.fs.stat(inputURI)).type !== vscode.FileType.Directory) {
+		await vscode.window.showErrorMessage('Neither the selected path nor its parent is not a directory.');
+		return null;
+	}
+	return uri;
+};
+const askSubfolderName = () => vscode.window.showInputBox({
+	title: 'Name of new subfolder',
+	placeHolder: 'e.g. permissions in users/permissions',
+});
+const askResourceNameKebabCase = (defaultVal?: string) => vscode.window.showInputBox({
+	title: 'Common FILE name',
+	placeHolder: 'e.g. user-permissions to generate user-permissions.*.ts',
+	value: defaultVal
+});
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -35,11 +53,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 
 	let rightClickMenuCmd = vscode.commands.registerCommand('vscode-nestjs-generator.createAtTargetedFolder', async (inputURI: vscode.Uri) => {
-		const uri = ((await vscode.workspace.fs.stat(inputURI)).type === vscode.FileType.Directory) ? inputURI : uriUtils.resolvePath(inputURI, '..');
-		if ((await vscode.workspace.fs.stat(inputURI)).type !== vscode.FileType.Directory) {
-			await vscode.window.showErrorMessage('Neither the selected path nor its parent is not a directory.');
-			return;
-		}
+		const uri = await getActualURI(inputURI);
+		if (!uri) { return; }
+
 		const resourceNameKebabCase = uri.path[uri.path.length - 1];
 		if (!resourceNameKebabCase) { return; }
 		const resNameInput = await vscode.window.showInputBox({
@@ -57,15 +73,13 @@ export function activate(context: vscode.ExtensionContext) {
 		return createInFolder(uri, resourceNameKebabCase, resNameInput, controllerPathInput);
 	});
 	let rightClickMenuCmdNoCon = vscode.commands.registerCommand('vscode-nestjs-generator.createAtTargetedFolderNoController', async (inputURI: vscode.Uri) => {
-		const uri = ((await vscode.workspace.fs.stat(inputURI)).type === vscode.FileType.Directory) ? inputURI : uriUtils.resolvePath(inputURI, '..');
-		if ((await vscode.workspace.fs.stat(inputURI)).type !== vscode.FileType.Directory) {
-			await vscode.window.showErrorMessage('Neither the selected path nor its parent is not a directory.');
-			return;
-		}
+		const uri = await getActualURI(inputURI);
+		if (!uri) { return; }
+		
 		const resourceNameKebabCase = uri.path[uri.path.length - 1];
 		if (!resourceNameKebabCase) { return; }
 		const resNameInput = await vscode.window.showInputBox({
-			title: 'Resource name (e.g. User)',
+			title: 'Resource class name (e.g. User)',
 			value: pascalize(resourceNameKebabCase),
 			valueSelection: undefined
 		});
@@ -74,17 +88,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let rightClickMenuSubfolderCmd = vscode.commands.registerCommand('vscode-nestjs-generator.createInSubFolder', async (inputURI: vscode.Uri) => {
-		const uri = ((await vscode.workspace.fs.stat(inputURI)).type === vscode.FileType.Directory) ? inputURI : uriUtils.resolvePath(inputURI, '..');
-		if ((await vscode.workspace.fs.stat(inputURI)).type !== vscode.FileType.Directory) {
-			await vscode.window.showErrorMessage('Neither the selected path nor its parent is not a directory.');
-			return;
-		}
-		const subfolderName = await vscode.window.showInputBox({
-			title: 'Subfolder & resource paths name',
-			placeHolder: 'e.g. user',
-		});
+		const uri = await getActualURI(inputURI);
+		if (!uri) { return; }
+		
+		const subfolderName = await askSubfolderName();
 		if (!subfolderName) { return; }
-		const resourceNameKebabCase = subfolderName;
+
+		const resourceNameKebabCase = await askResourceNameKebabCase();
+		if (!resourceNameKebabCase) { return; }
+
 		const resNameInput = await vscode.window.showInputBox({
 			title: 'Resource name (e.g. User)',
 			value: pascalize(resourceNameKebabCase),
@@ -92,7 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 		if (!resNameInput) { return; }
 		const controllerPathInput = await vscode.window.showInputBox({
-			title: 'Specify API endpoint path (empty for no controller)',
+			title: 'Specify API endpoint path. Leave empty for no controller.',
 			value: '/' + resourceNameKebabCase,
 			valueSelection: undefined
 		});
@@ -100,20 +112,17 @@ export function activate(context: vscode.ExtensionContext) {
 		return createInFolder(uriUtils.resolvePath(uri, subfolderName), resourceNameKebabCase, resNameInput, controllerPathInput);
 	});
 	let rightClickMenuSubfolderCmdNoCon = vscode.commands.registerCommand('vscode-nestjs-generator.createInSubFolderNoController', async (inputURI: vscode.Uri) => {
-		const uri = ((await vscode.workspace.fs.stat(inputURI)).type === vscode.FileType.Directory) ? inputURI : uriUtils.resolvePath(inputURI, '..');
-		if ((await vscode.workspace.fs.stat(inputURI)).type !== vscode.FileType.Directory) {
-			await vscode.window.showErrorMessage('Neither the selected path nor its parent is not a directory.');
-			return;
-		}
-		const subfolderName = await vscode.window.showInputBox({
-			title: 'Subfolder & resource paths name',
-			placeHolder: 'e.g. foo -> foo.service.ts, foo.module.ts, foo.controller.ts',
-		});
+		const uri = await getActualURI(inputURI);
+		if (!uri) { return; }
+		
+		const subfolderName = await askSubfolderName();
 		if (!subfolderName) { return; }
-		const resourceNameKebabCase = subfolderName;
+
+		const resourceNameKebabCase = await askResourceNameKebabCase();
 		if (!resourceNameKebabCase) { return; }
+
 		const resNameInput = await vscode.window.showInputBox({
-			title: 'Resource classes name (e.g. User)',
+			title: 'Resource class name prefix (e.g. User for UserService/UserModule etc)',
 			value: pascalize(resourceNameKebabCase),
 			valueSelection: undefined
 		});
